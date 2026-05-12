@@ -1,37 +1,63 @@
-# Forschungskonzept: Post-Game-Analyse von Fußballspielen mit Machine Learning
+# Vorhersage des Spielausgangs in der Fußball-Bundesliga
+## ML – Projekt | I. Eckel (), E. Ekici (), A.Holaj (214922)  | SoSe 2026 | Hochschule Heilbronn
+
+---
 
 ## 1. Einleitung und Zieldefinition
 
-Fußballspiele entstehen durch ein Zusammenspiel aus offensiven Aktionen, defensiver Stabilität, Standardsituationen, Spielverlauf und Zufall. In diesem Projekt wird untersucht, welche im Datensatz verfügbaren Spielmerkmale mit dem Endergebnis eines Fußballspiels zusammenhängen. Im Mittelpunkt steht nicht die Vorhersage eines Spiels vor dem Anpfiff, sondern eine **Post-Game-Analyse**: Das Modell nutzt nach dem Spiel beobachtbare Leistungs- und Ereignismerkmale, um das Ergebnis nachträglich zu erklären und Muster zwischen Spielstatistiken und Resultat sichtbar zu machen.
+### 1.1 Motivation und Problemkontext
+Professioneller Fußball ist ein komplexes, dynamisches System, in dem der Spielausgang durch eine Vielzahl von Faktoren beeinflusst wird. Gleichzeitig ist die quantitative Analyse von Fußballergebnissen seit Jahrzehnten Gegenstand von Datenanalysen. Sie wird aus sportanalytischen, journalistischen und kommerziellen Interessen heraus betrieben (vgl. Dixon & Coles, 1997). 
+Die vorliegende Arbeit nutzt einen Datensatz der Fußball-Bundesliga aus einem zehnjährigen Zeitraum (2015–2025), um eine Brücke zwischen der retrospektiven Erklärung (Post-Game-Analyse) und der prospektiven Vorhersagegüte (Pre-Game-Ausblick) zu schlagen.
 
-Die zentrale Zielvariable ist das `Endergebnis` mit den drei Klassen:
+### 1.2 Wissenschaftliche Fragestellungen
 
-- `H` = Heimsieg
-- `D` = Unentschieden
-- `A` = Auswärtssieg
+Das Projekt gliedert sich in zwei Hauptfragestellungen:
 
-Der verwendete Datensatz umfasst **3024 Spiele** und **179 Variablen**. In den vorliegenden Daten ist die Liga als `D1` codiert. Der Zeitraum reicht nach Datumsbereinigung von **2015-08-14 bis 2026-04-19**. Die Klassenverteilung lautet aktuell: **{'H': 1350, 'A': 920, 'D': 754}**. Diese Verteilung zeigt, dass die Klassen nicht vollständig gleich verteilt sind; deshalb wird im Projekt geprüft, ob geeignete Strategien für unausgewogene Daten notwendig sind.
+**F1:** Lässt sich der Ausgang eines Bundesliga-Spiels (Heimsieg / Unentschieden / Auswärtssieg) anhand von Spielstatistiken wie Schüssen aufs Tor, Ecken und Karten klassifizieren?
 
-### Forschungsfrage
+**F2:** Welche Spielstatistiken besitzen die höchste Vorhersagekraft für den Sieg einer Mannschaft?
 
-**Inwiefern lassen sich Fußball-Endergebnisse anhand nach dem Spiel verfügbarer Spielstatistiken wie Schüsse, Schüsse aufs Tor, Ecken, Fouls, Karten und Halbzeitstand erklären, und welche Merkmale tragen am stärksten zur Unterscheidung zwischen Heimsieg, Unentschieden und Auswärtssieg bei?**
+**F3:** Mit welcher Präzision lässt sich die absolute Anzahl erzielter Tore auf Basis der erhobenen Variablen modellieren?
 
-### Zielsetzung
+### 1.3 Datenbasis
+
+Die Datenbasis stammt von [football-data.co.uk](https://www.football-data.co.uk/germanym.php) und umfasst 3024 Spielpaarungen der 1. Fußball-Bundesliga aus einem zehnjährigen Zeitraum (2015–2025) mit 179 Variablen: Spielmetadaten, Endergebnis, Halbzeitdaten, Match-Statistiken sowie Wettquoten von über 15 Anbietern.
+
+---
+
+## 2. Theoretischer Hintergrund
+
+### 2.1 Statistische Modellierung von Fußballergebnissen
+
+Dixon & Coles (1997) zeigten, dass Tore näherungsweise Poisson-verteilt sind und entwickelten ein Modell zur Korrektur von Niedrigtor-Spielen. Baio & Blangiardo (2010) erweiterten dies durch hierarchische Bayes-Modelle mit teamspezifischen Angriffs- und Abwehrstärken. Für die vorliegende Arbeit besonders relevant ist Goddard & Asimakopoulos (2004), die multinomiale Logit-Regression zur Dreieklassen-Vorhersage einsetzten und eine Baseline-Accuracy von ~53 % erzielten.
+
+### 2.2 Heimvorteil als strukturelle Variable
+
+Der Heimvorteil ist eines der robustesten Phänomene im Fußball (Pollard, 2006). Dies begründet die Verwendung von Differenz-Features (z. B. `Schuss_Differenz = Heim_Schuesse − Gast_Schuesse`), um relative Dominanz direkt abzubilden.
+
+
+### 2.3 Literatur
+
+- Baio, G., & Blangiardo, M. (2010). Bayesian hierarchical model for the prediction of football results. *Journal of Applied Statistics*, 37(2), 253–264.
+- Dixon, M. J., & Coles, S. G. (1997). Modelling association football scores and inefficiencies in the football betting market. *Journal of the Royal Statistical Society: Series C*, 46(2), 265–280.
+- Goddard, J., & Asimakopoulos, I. (2004). Forecasting football results and the efficiency of fixed-odds betting. *Journal of Forecasting*, 23(1), 51–66.
+- Pollard, R. (2006). Home advantage in soccer. *Journal of Sport Behavior*, 29(2), 169.
+
+---
+### 3. Zielsetzung
 
 Das Projekt verfolgt vier Ziele:
 
 1. **Datenverständnis und Datenqualität:** Der Datensatz wird geladen, strukturell untersucht und hinsichtlich fehlender Werte, Datentypen, Ausreißer und möglicher Inkonsistenzen geprüft.
-2. **Feature Engineering:** Aus bestehenden Spielstatistiken werden interpretierbare Differenzmerkmale gebildet, z. B. `ShotDiff`, `ShotOnTargetDiff`, `CornerDiff`, `FoulDiff` und `CardDiff`.
-3. **Modellvergleich:** Eine interpretierbare logistische Regression dient als Baseline. Anschließend wird ein Random-Forest-Modell als nicht-lineares Vergleichsmodell trainiert.
-4. **Evaluation und Interpretation:** Die Modelle werden anhand geeigneter Klassifikationsmetriken bewertet. Im Vordergrund stehen `Macro F1`, `Accuracy`, `Classification Report` und `Confusion Matrix`. Zusätzlich werden wichtige Merkmale interpretiert.
-
-Wichtig ist die methodische Abgrenzung: Da Spielstatistiken wie Schüsse und Ecken erst während bzw. nach dem Spiel bekannt sind, wird das Projekt **nicht als Pre-Game-Prognose**, sondern als erklärende Analyse bereits abgeschlossener Spiele formuliert. Dadurch wird vermieden, dass das Modell als echtes Vorhersagesystem für zukünftige Spiele missverstanden wird.
+2. **Feature Engineering:** Aus bestehenden Spielstatistiken werden interpretierbare Merkmale gebildet.
+3. **Modellvergleich:** Eine interpretierbare logistische Regression dient als Baseline. Anschließend wird ein Random-Forest-Modell als nicht-lineares Vergleichsmodell trainiert. ??????????????
+4. **Evaluation und Interpretation:** Die Modelle werden anhand geeigneter Klassifikationsmetriken bewertet. Im Vordergrund stehen `Macro F1`, `Accuracy`, `Classification Report` und `Confusion Matrix`. Zusätzlich werden wichtige Merkmale interpretiert.????????????????
 
 ---
 
-## 2. Beschreibung der Methodik
+## 4. Methodik
 
-### 2.1 Forschungsdesign
+### 4.1 Überblick über den Machine Learning Prozess
 
 Das Projekt wird als überwachtes Klassifikationsproblem umgesetzt. Die Zielvariable `Endergebnis` ist diskret und besitzt drei Ausprägungen. Die Eingabevariablen bestehen aus numerischen und kategorialen Spielmerkmalen. Der Fokus liegt auf der Erklärung von Ergebniszusammenhängen und dem Vergleich verschiedener Modellansätze.
 
@@ -48,9 +74,9 @@ Die Vorgehensweise orientiert sich an einem reproduzierbaren Machine-Learning-Pr
 9. Evaluation mit Klassifikationsmetriken
 10. Interpretation und kritische Diskussion
 
-### 2.2 Datenbasis
+### 4.2 Datenbasis
 
-Die Daten werden aus der Datei `Datensatz_FootballData.csv` geladen. Enthalten sind u. a.:
+Die Daten werden aus der Datei `Datensatz_FootballData.csv` geladen. Enthalten sind u. a.: ?????????
 
 - Stammdaten: `Liga`, `Datum`, `Uhrzeit`, `Heimmannschaft`, `Gastmannschaft`
 - Ergebnisdaten: `Endergebnis_Heim_Tore`, `Endergebnis_Gast_Tore`, `Endergebnis`
@@ -60,11 +86,9 @@ Die Daten werden aus der Datei `Datensatz_FootballData.csv` geladen. Enthalten s
 
 Für die erste Modellstufe werden primär Spielstatistiken verwendet. Ergebnisableitende Variablen wie `Endergebnis_Heim_Tore` und `Endergebnis_Gast_Tore` werden nicht als Input verwendet, weil sie die Zielvariable direkt definieren und damit zu Data Leakage führen würden.
 
-### 2.3 Explorative Datenanalyse
+### 4.3 Explorative Datenanalyse (EDA)
 
-Die explorative Datenanalyse dient dazu, die Hauptmerkmale des Datensatzes zu verstehen, Muster und Zusammenhänge zu entdecken, Ausreißer zu erkennen und erste Hypothesen zu formulieren.
-
-Geplante EDA-Schritte:
+Die EDA wird eingesetzt, um Hauptmerkmale zu verstehen, Muster zu entdecken, Ausreißer zu identifizieren und erste Hypothesen zu formulieren. Konkret umfasst die EDA:
 
 - Größe und Struktur des Datensatzes prüfen
 - Datentypen und fehlende Werte analysieren
@@ -72,9 +96,10 @@ Geplante EDA-Schritte:
 - Verteilung zentraler Spielstatistiken untersuchen
 - Klassenunterschiede bei Schüssen, Schüssen aufs Tor und Ecken analysieren
 - Korrelationen zwischen numerischen Merkmalen prüfen
-- Auffälligkeiten bei fehlenden Werten in Wettquoten-Spalten dokumentieren
+- Auffälligkeiten bei fehlenden Werten in Wettquoten-Spalten dokumentier
 
-### 2.4 Datenbereinigung
+
+### 4.4 Datenbereinigung
 
 Die Datenbereinigung umfasst die Behandlung von Fehlern, Inkonsistenzen, fehlenden Werten und irrelevanten Einträgen.
 
@@ -87,7 +112,7 @@ Geplante Bereinigungsschritte:
 - Kategoriale fehlende Werte mit einer eigenen Kategorie oder dem häufigsten Wert behandeln
 - Ergebnisnahe Variablen aus den Modellfeatures ausschließen, um Data Leakage zu vermeiden
 
-### 2.5 Umgang mit unbalancierten Klassen
+### 4.5 Umgang mit unbalancierten Klassen
 
 Da die Zielvariable nicht gleichmäßig verteilt ist, wird die Klassenbalance geprüft. Für die erste Modellierung wird die reale Verteilung zunächst beibehalten. Zusätzlich werden folgende Maßnahmen berücksichtigt:
 
@@ -96,7 +121,7 @@ Da die Zielvariable nicht gleichmäßig verteilt ist, wird die Klassenbalance ge
 - Optional: `class_weight="balanced"` bei der logistischen Regression
 - Optional: Vergleich mit und ohne Klassenumgewichtung
 
-### 2.6 Feature Engineering
+### 4.6 Feature Engineering
 
 Aus den Rohdaten werden neue Merkmale erstellt, die Fußballlogik besser abbilden als isolierte Einzelwerte. Besonders relevant sind Differenz-Features zwischen Heim- und Auswärtsteam:
 
@@ -110,7 +135,7 @@ Aus den Rohdaten werden neue Merkmale erstellt, die Fußballlogik besser abbilde
 
 Diese Merkmale sind gut interpretierbar: Ein positiver Wert bedeutet jeweils einen Vorteil bzw. höheren Wert für die Heimmannschaft, ein negativer Wert einen höheren Wert für die Gastmannschaft.
 
-### 2.7 Feature Selection
+### 4.7 Feature Selection
 
 Im ersten Schritt wird eine fachlich begründete Auswahl weniger, gut interpretierbarer Merkmale verwendet. Anschließend können Korrelationen, Mutual Information oder Modellimportanzen genutzt werden, um relevante Merkmale zu identifizieren und redundante Merkmale zu reduzieren.
 
@@ -121,7 +146,7 @@ Nicht aufgenommen werden zunächst:
 - sehr lückenhafte Wettquoten-Spalten
 - IDs oder rein administrative Felder
 
-### 2.8 Modellierung
+### 4.8 Modellierung
 
 Es werden drei Modellvarianten vorgesehen:
 
@@ -137,7 +162,7 @@ Die logistische Regression dient als interpretierbare Baseline. Sie eignet sich,
 
 Der Random Forest dient als nicht-lineares Vergleichsmodell. Er kann komplexere Zusammenhänge und Interaktionen zwischen Spielmerkmalen abbilden. Gleichzeitig lassen sich Feature Importances auswerten.
 
-### 2.9 Evaluation
+### 4.9 Evaluation
 
 Da es sich um ein dreiklassiges Klassifikationsproblem handelt, werden mehrere Metriken kombiniert:
 
@@ -148,7 +173,7 @@ Da es sich um ein dreiklassiges Klassifikationsproblem handelt, werden mehrere M
 
 Die wichtigste Hauptmetrik ist **Macro F1**, da die Klassen unterschiedlich häufig auftreten und alle Ergebnisarten fair berücksichtigt werden sollen.
 
-### 2.10 Interpretation und kritische Diskussion
+### 4.10 Interpretation und kritische Diskussion
 
 Die Ergebnisse werden nicht nur anhand der Modellleistung bewertet, sondern auch fachlich interpretiert. Dabei stehen folgende Fragen im Mittelpunkt:
 
@@ -159,7 +184,7 @@ Die Ergebnisse werden nicht nur anhand der Modellleistung bewertet, sondern auch
 - Welche Grenzen ergeben sich aus der Post-Game-Perspektive?
 - Welche Erweiterungen wären für eine echte Pre-Game-Prognose notwendig?
 
-### 2.11 Reproduzierbarkeit
+### 4.11 Reproduzierbarkeit
 
 Das Notebook dokumentiert alle Schritte nachvollziehbar. Dazu gehören:
 
@@ -171,7 +196,7 @@ Das Notebook dokumentiert alle Schritte nachvollziehbar. Dazu gehören:
 
 ---
 
-## 3. Geplante Notebook-Struktur
+## 5. Geplante Notebook-Struktur
 
 1. Titel, Forschungsfrage und Zieldefinition
 2. Setup und Imports
@@ -193,13 +218,3 @@ Das Notebook dokumentiert alle Schritte nachvollziehbar. Dazu gehören:
 18. Feature Importance und Interpretation
 19. Kritische Diskussion
 20. Fazit und nächste Schritte
-
----
-
-## 4. Literaturhinweise für das Portfolio
-
-- Dixon, M. J., & Coles, S. G. (1997). *Modelling Association Football Scores and Inefficiencies in the Football Betting Market*. Journal of the Royal Statistical Society: Series C.
-- Goddard, J. (2005). *Regression models for forecasting goals and match results in association football*. International Journal of Forecasting.
-- Ulmer, B., & Fernandez, M. (2014). *Predicting Soccer Match Results in the English Premier League*. Stanford University.
-- Baio, G., & Blangiardo, M. (2010). *Bayesian hierarchical model for the prediction of football results*. Journal of Applied Statistics.
-- Pedregosa, F. et al. (2011). *Scikit-learn: Machine Learning in Python*. Journal of Machine Learning Research, 12, 2825–2830.
