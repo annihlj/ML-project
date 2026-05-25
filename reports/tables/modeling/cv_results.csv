@@ -1,0 +1,6 @@
+model,cv_pr_auc_mean,cv_pr_auc_std
+lightgbm,0.2293,0.0127
+hist_gbdt,0.2255,0.0137
+logreg,0.2185,0.0115
+random_forest,0.1983,0.0046
+dummy,0.0807,0.0001
